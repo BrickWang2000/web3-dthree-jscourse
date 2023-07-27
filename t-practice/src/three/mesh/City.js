@@ -15,7 +15,7 @@ export default class City {
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath("./draco/");
     this.loader.setDRACOLoader(dracoLoader);
-    this.loader.load("./model/city4.glb", (gltf) => {
+    this.loader.load("./model/8-01.glb", (gltf) => {
       console.log(gltf);
       scene.add(gltf.scene);
 

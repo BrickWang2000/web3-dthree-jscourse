@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <Scene :eventList="eventList"></Scene>
-    <BigScreen></BigScreen>
+<!--    <BigScreen></BigScreen>-->
   </div>
 </template>
 
