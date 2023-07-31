@@ -1,10 +1,4 @@
-//目标：灯光与阴影
-// // 灯光阴影
-// // 1、材质要满足能够对光照有反应
-// // 2、设置渲染器开启阴影的计算 renderer.shadowMap.enabled = true;
-// // 3、设置光照投射阴影 directionalLight.castShadow = true;
-// // 4、设置物体投射阴影 sphere.castShadow = true;
-// // 5、设置物体接收阴影 plane.receiveShadow = true;
+//目标：点光源
 import  * as THREE from "three";
 import requestAnimationFrame from "dat.gui/src/dat/utils/requestAnimationFrame";
 //导入控制器
@@ -15,7 +9,7 @@ import gsap from "gsap";
 // 导入dat.gui
 import * as dat from "dat.gui";
 
-
+const gui = new dat.GUI();
 //1、场景
 const scene = new THREE.Scene();
 
@@ -56,17 +50,32 @@ scene.add(plane);
 // 环境光
 const light = new THREE.AmbientLight(0xffffff, 0.5); // soft white light
 scene.add(light);
+//点
+const smallBall = new THREE.Mesh(
+    new THREE.SphereGeometry(0.1, 20, 20),
+    new THREE.MeshBasicMaterial({ color: 0xff0000 })
+);
+smallBall.position.set(2, 2, 2);
 //直线光源
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight.position.set(135, 20, 0);
-directionalLight.castShadow = true;
-scene.add(directionalLight);
+const pointLight = new THREE.PointLight(0xff0000, 1);
+// pointLight.position.set(2, 2, 2);
+pointLight.castShadow = true;
+// 设置阴影贴图模糊度
+pointLight.shadow.radius = 20;
+// 设置阴影贴图的分辨率
+pointLight.shadow.mapSize.set(512, 512);
+pointLight.decay = 0;
+
+// 设置透视相机的属性
+smallBall.add(pointLight);
+scene.add(smallBall);
 
 //4、初始化渲染器 渲染画布
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth,window.innerHeight);
 // 开启场景中的阴影贴图
 renderer.shadowMap.enabled = true;
+renderer.physicallyCorrectLights = true;
 // console.log(renderer);
 document.body.appendChild(renderer.domElement);
 //使用渲染器，通过相机将场景渲染进来
@@ -74,16 +83,21 @@ document.body.appendChild(renderer.domElement);
 
 
 //创建轨道控制器
-const  controls = new OrbitControls(camera ,renderer.domElement);
+const controls = new OrbitControls(camera ,renderer.domElement);
 //设置控制器阻尼,让控制器更有真实效果，必须在动画循环里调用update()
-controls.enableDamping =true ;
+controls.enableDamping = true ;
 
 //添加坐标辅助器
 const axesHelper = new THREE.AxesHelper( 20 );
 scene.add(axesHelper);
 
-
+// 设置时钟
+const clock = new THREE.Clock();
 function render(){
+    let time = clock.getElapsedTime();
+    smallBall.position.x = Math.sin(time) * 3;
+    smallBall.position.z = Math.cos(time) * 3;
+    smallBall.position.y = 2 + Math.sin(time * 10) / 2;
     controls.update();
     renderer.render(scene,camera);
     requestAnimationFrame(render);
